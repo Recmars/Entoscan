@@ -6,8 +6,5 @@ pydantic
 numpy
 python-multipart
 gunicorn
-import absl.logging
-import os
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
-absl.logging.set_verbosity(absl.logging.ERROR)
+
 
