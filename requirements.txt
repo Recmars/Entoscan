@@ -5,3 +5,4 @@ pillow
 pydantic
 numpy
 python-multipart
+gunicorn
