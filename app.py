@@ -3,6 +3,7 @@ import numpy as np
 from PIL import Image, UnidentifiedImageError
 import io
 from fastapi import FastAPI, UploadFile, File
+import uvicorn
 import traceback
 
 app = FastAPI()
@@ -52,5 +53,5 @@ async def predict(file: UploadFile = File(...)):
         return {"error": error_message}, 500
 
 if __name__ == "__main__":
-    import uvicorn
+    print("Starting server on 0.0.0.0:8000") #add print statement.
     uvicorn.run(app, host="0.0.0.0", port=8000)
