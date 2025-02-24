@@ -1,8 +1,4 @@
 fastapi
 uvicorn
 tensorflow
-pillow
-pydantic
-numpy
-python-multipart
-gunicorn
+Pillow
