@@ -1,6 +1,6 @@
 import tensorflow as tf
 import numpy as np
-from PIL import Image
+from PIL import Image, UnidentifiedImageError
 import io
 from fastapi import FastAPI, UploadFile, File
 import traceback
@@ -44,10 +44,12 @@ async def predict(file: UploadFile = File(...)):
             "class": class_labels[predicted_index],
             "confidence": confidence
         }
+    except UnidentifiedImageError:
+        return {"error": "Uploaded file is not a valid image."}, 400 #Bad Request.
     except Exception as e:
         error_message = f"Error during prediction: {e}\n{traceback.format_exc()}"
-        print(error_message) #print to render logs
-        return {"error": error_message}, 500 #return internal server error.
+        print(error_message)
+        return {"error": error_message}, 500
 
 if __name__ == "__main__":
     import uvicorn
