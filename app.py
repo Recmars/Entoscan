@@ -3,6 +3,7 @@ import numpy as np
 from PIL import Image
 import io
 from fastapi import FastAPI, UploadFile, File
+import traceback
 
 app = FastAPI()
 
@@ -27,23 +28,26 @@ class_labels = [
 
 @app.post("/predict/")
 async def predict(file: UploadFile = File(...)):
-    image_bytes = await file.read()
-    image = Image.open(io.BytesIO(image_bytes))
-    image_array = preprocess_image(image)
-    
-    # Set input tensor
-    interpreter.set_tensor(input_details[0]['index'], image_array)
-    interpreter.invoke()
-    
-    # Retrieve the output tensor
-    predictions = interpreter.get_tensor(output_details[0]['index'])
-    predicted_index = int(np.argmax(predictions))
-    confidence = float(np.max(predictions))
-    
-    return {
-        "class": class_labels[predicted_index],
-        "confidence": confidence
-    }
+    try:
+        image_bytes = await file.read()
+        image = Image.open(io.BytesIO(image_bytes))
+        image_array = preprocess_image(image)
+
+        interpreter.set_tensor(input_details[0]['index'], image_array)
+        interpreter.invoke()
+
+        predictions = interpreter.get_tensor(output_details[0]['index'])
+        predicted_index = int(np.argmax(predictions))
+        confidence = float(np.max(predictions))
+
+        return {
+            "class": class_labels[predicted_index],
+            "confidence": confidence
+        }
+    except Exception as e:
+        error_message = f"Error during prediction: {e}\n{traceback.format_exc()}"
+        print(error_message) #print to render logs
+        return {"error": error_message}, 500 #return internal server error.
 
 if __name__ == "__main__":
     import uvicorn
