@@ -9,7 +9,7 @@ from .utils import load_labels, load_and_preprocess_image_keras
 app = FastAPI()
 
 # Load Keras model and labels
-model = tf.keras.models.load_model("app/your_keras_model.keras")  # Replace with your model path
+model = tf.keras.models.load_model("app/mobilenetv3-insect2.keras")  # Replace with your model path
 labels = load_labels("app/labels.txt")
 
 # Get input shape from the model
