@@ -3,4 +3,3 @@ uvicorn
 tensorflow
 Pillow
 python-multipart
-gunicorn
