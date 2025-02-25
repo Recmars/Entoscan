@@ -11,7 +11,6 @@ def load_and_preprocess_image(image_path, image_size):
     img = img.resize(image_size)
     img_array = np.array(img, dtype=np.float32)
     img_array = np.expand_dims(img_array, axis=0)  # Add batch dimension
-    img_array = img_array / 255.0  # Normalize
     return img_array
 
 def classify_image(image_array, interpreter):
