@@ -9,11 +9,11 @@ from .utils import load_labels, load_and_preprocess_image_keras
 app = FastAPI()
 
 # Load Keras model and labels
-model = tf.keras.models.load_model("app/mobilenetv3-insect2.keras")  # Replace with your model path
+model = tf.keras.models.load_model("app/mobilenetv3-insect2.keras")
 labels = load_labels("app/labels.txt")
 
 # Get input shape from the model
-input_shape = model.input_shape[1:3]  # Extract height and width
+input_shape = model.input_shape[1:3]
 
 @app.post("/classify/")
 async def classify_endpoint(file: UploadFile = File(...)):
@@ -23,8 +23,8 @@ async def classify_endpoint(file: UploadFile = File(...)):
     try:
         image_data = await file.read()
         image = Image.open(BytesIO(image_data)).convert('RGB')
-        image.save("temp.jpg")  # Saving for temporary processing.
-        image_array = load_and_preprocess_image_keras("temp.jpg", input_shape)  # Preprocess the image.
+        image.save("temp.jpg")
+        image_array = load_and_preprocess_image_keras("temp.jpg", input_shape)
 
         predictions = model.predict(image_array)
         predicted_class_index = np.argmax(predictions)
