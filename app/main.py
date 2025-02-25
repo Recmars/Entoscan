@@ -4,16 +4,18 @@ import tensorflow as tf
 import numpy as np
 from PIL import Image
 from io import BytesIO
-from .utils import load_labels, load_and_preprocess_image_keras
+from .utils import load_labels, load_and_preprocess_image, classify_image
 
 app = FastAPI()
 
-# Load Keras model and labels
-model = tf.keras.models.load_model("app/mobilenetv3-insect2.keras")
+# Load TFLite model and labels
+interpreter = tf.lite.Interpreter(model_path="app/model.tflite")
+interpreter.allocate_tensors()
 labels = load_labels("app/labels.txt")
 
 # Get input shape from the model
-input_shape = model.input_shape[1:3]
+input_details = interpreter.get_input_details()
+input_shape = input_details[0]['shape'][1:3]  # Extract height and width
 
 @app.post("/classify/")
 async def classify_endpoint(file: UploadFile = File(...)):
@@ -23,13 +25,13 @@ async def classify_endpoint(file: UploadFile = File(...)):
     try:
         image_data = await file.read()
         image = Image.open(BytesIO(image_data)).convert('RGB')
-        image.save("temp.jpg")
-        image_array = load_and_preprocess_image_keras("temp.jpg", input_shape)
+        image.save("temp.jpg") #Saving for temporary processing.
+        image_array = load_and_preprocess_image("temp.jpg", input_shape) #Preprocess the image.
 
-        predictions = model.predict(image_array)
+        predictions = classify_image(image_array, interpreter)
         predicted_class_index = np.argmax(predictions)
         predicted_class_label = labels[predicted_class_index]
-        confidence = float(predictions[0][predicted_class_index])
+        confidence = float(predictions[predicted_class_index])
 
         return JSONResponse({
             "predicted_class": predicted_class_label,
