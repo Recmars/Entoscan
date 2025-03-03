@@ -9,7 +9,7 @@ from .utils import load_labels, load_and_preprocess_image, classify_image
 app = FastAPI()
 
 # Load TFLite models and labels
-tribe_interpreter = tf.lite.Interpreter(model_path="app/mobilenetv3-file2.tflite")
+tribe_interpreter = tf.lite.Interpreter(model_path="app/mobilenetv3-file3.tflite")
 tribe_interpreter.allocate_tensors()
 tribe_labels = load_labels("app/labels_tribe.txt")
 
