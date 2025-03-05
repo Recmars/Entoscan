@@ -24,6 +24,8 @@ tribe_input_shape = tribe_input_details[0]['shape'][1:3]
 insect_input_details = insect_interpreter.get_input_details()
 insect_input_shape = insect_input_details[0]['shape'][1:3]
 
+THRESHOLD = 0.7  # 70% threshold
+
 @app.post("/classify/")
 async def classify_endpoint(file: UploadFile = File(...)):
     if not file.content_type.startswith("image/"):
@@ -41,6 +43,12 @@ async def classify_endpoint(file: UploadFile = File(...)):
         tribe_predicted_class_label = tribe_labels[tribe_predicted_class_index]
         tribe_confidence = float(tribe_predictions[tribe_predicted_class_index])
 
+        if tribe_confidence < THRESHOLD:
+            return JSONResponse({
+                "predicted_class": "Please capture more clearly",
+                "confidence": tribe_confidence
+            })
+
         if tribe_predicted_class_label == "batocerini insect":
             # Classify insect
             insect_image_array = load_and_preprocess_image("temp.jpg", insect_input_shape)
@@ -48,6 +56,12 @@ async def classify_endpoint(file: UploadFile = File(...)):
             insect_predicted_class_index = np.argmax(insect_predictions)
             insect_predicted_class_label = insect_labels[insect_predicted_class_index]
             insect_confidence = float(insect_predictions[insect_predicted_class_index])
+
+            if insect_confidence < THRESHOLD:
+                return JSONResponse({
+                    "predicted_class": "Please capture more clearly",
+                    "confidence": insect_confidence
+                })
 
             return JSONResponse({
                 "predicted_class": insect_predicted_class_label,
